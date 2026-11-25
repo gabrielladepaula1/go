@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PS Obstétrico · Modelos de anamnese e exame</title>
+<style>
+:root {
+  --bg: #f7f7f5; --surface: #ffffff; --text: #1d1d1b; --muted: #6b6b66;
+  --border: #e2e2dd; --accent: #2f6f5e; --accent-soft: #e4f0ec;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161715; --surface: #1f201d; --text: #ececE6; --muted: #9a9a92;
+    --border: #33342f; --accent: #7fc2ae; --accent-soft: #223a33;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161715; --surface: #1f201d; --text: #ececE6; --muted: #9a9a92;
+  --border: #33342f; --accent: #7fc2ae; --accent-soft: #223a33;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; line-height: 1.5; }
+header { padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 5; }
+h1 { font-size: 18px; margin: 0 0 8px; }
+#busca { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 15px; }
+nav#abas { display: flex; gap: 6px; overflow-x: auto; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--border); scrollbar-width: thin; }
+nav#abas button { flex: 0 0 auto; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; font-size: 14px; white-space: nowrap; }
+nav#abas button[aria-selected="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+main { padding: 16px; max-width: 860px; margin: 0 auto; }
+.bloco { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+.bloco-topo { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+.bloco h2 { font-size: 15px; margin: 0; color: var(--accent); }
+.copiar { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent); cursor: pointer; font-size: 13px; white-space: nowrap; }
+.texto { white-space: pre-wrap; font-size: 15px; margin: 0; overflow-wrap: anywhere; }
+.oculto { display: none; }
+.vazio { color: var(--muted); font-style: italic; }
+footer { text-align: center; color: var(--muted); font-size: 12px; padding: 24px 16px calc(24px + env(safe-area-inset-bottom, 0px)); }
+</style>
+</head>
+<body>
+<header>
+  <h1>PS Obstétrico · Modelos de anamnese e exame</h1>
+  <input id="busca" type="search" placeholder="Buscar tema ou palavra (ex.: sangramento, BCF, TEP)" aria-label="Buscar">
+</header>
+<nav id="abas" role="tablist" aria-label="Queixas"></nav>
+<main id="conteudo"></main>
+<footer>Modelos para preenchimento. Confira sempre com o protocolo do serviço e com a sua avaliação clínica.</footer>
+
+<script>
+const SECOES_TODAS = [
+  {
+    id: "geral",
+    aba: "Geral",
+    titulo: "Anamnese e exame geral (qualquer queixa)",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de [___] iniciada há [___], de intensidade EVA [___]/10, de caráter [___], localização [___], com irradiação [___ / sem irradiação]. Piora com [___] e melhora com [___]. Associa [febre / náusea / vômito / sangramento vaginal / perda de líquido / alteração urinária / alteração intestinal / sintomas respiratórios / sem sintomas associados]. Nega [___]. Movimentos fetais [presentes / diminuídos / ausentes], última percepção há [___]. Contrações [ausentes / presentes, frequência ___ em 10 minutos]. Gestação de [___] semanas, DUM [___], pré-natal [regular / irregular], com [sem / com] intercorrências. Gestações anteriores [___], partos [___], abortamentos [___]. Cesárea prévia [não / sim]. Comorbidades [___]. Medicações em uso [___], alergias [___]. Uso de substâncias [negado / referido: ___]. Tipagem [___], Rh [positivo / negativo]."
+      },
+      {
+        t: "Exame físico",
+        x: "Ao exame, BEG [ou outro estado: ___], [consciente e orientada em tempo e espaço / alterada: ___], PA [___] mmHg, FC [___] bpm, FR [___] irpm, SpO2 [___]%, TAX [___] °C. Pele e mucosas [normocoradas e úmidas / pálidas / ictéricas / desidratadas]. Aparelho respiratório com [MVF presente, simétrico, sem ruídos adventícios / alterações: ___]. Aparelho cardiovascular com [BRNF em 2 tempos, sem sopros / alterações: ___]. Abdome [flácido, indolor, RHA presentes / doloroso em ___ / com irritação peritoneal / gravídico, globoso, compatível com IG]. Membros [sem edemas, sem lesões, TEC < 3 s / edema ___ / alterações ___]. Panturrilhas [sem dor e sem empastamento / alteração ___]. SNC [pupilas isocóricas e fotorreagentes, sem déficits focais, sem sinais meníngeos / alterações ___]."
+      },
+      {
+        t: "Exame obstétrico",
+        x: "Exame obstétrico [normal para a IG / alterações: ___]: AU [___] cm, BCF [___] bpm, apresentação [___], dinâmica uterina [ausente / presente, ___ em 10 minutos], especular [sem sangramento / sangramento de origem ___, colo ___], toque vaginal [não realizado / realizado: colo ___ cm, apagamento ___%, bolsa ___]."
+      },
+      {
+        t: "Exame específico e exames",
+        x: "Exame específico à queixa: [descrever achados relevantes, com lateralidade, localização, tamanho, aspecto e evolução]. Exames complementares solicitados: [___]. Resultados: [___]."
+      },
+      {
+        t: "Hipóteses e conduta",
+        x: "Hipóteses diagnósticas: [___], com diferenciais [___]. Conduta registrada: [medicações, com dose, via e horário] [procedimentos realizados] [internação, observação ou alta, com orientações e sinais de alarme] [comunicação à equipe de referência às ___ horas] [reavaliação às ___ horas, com evolução: ___]."
+      }
+    ]
+  },
+  {
+    id: "soap",
+    aba: "SOAP",
+    titulo: "Esqueleto SOAP",
+    blocos: [
+      {
+        t: "Identificação e contexto",
+        x: "Nome, idade [___]. IG [___]. DUM [___]. DPP [___]. Tipo sanguíneo e fator Rh [___]. Sorologias e vacinação relevantes [___]. Pré-natal: número de consultas, intercorrências, exames de rotina e de rastreio (morfológico, glicose, sífilis, HIV, hepatites, urocultura) [___]. Comorbidades, medicações em uso, alergias, cirurgias prévias (incluindo cesárea) [___]."
+      },
+      {
+        t: "Objetivo, sinais vitais e abdome gravídico",
+        x: "FC [___] bpm, FR [___] irpm, SatO2 [___]%, PA [___] mmHg, Temp [___] °C. Peso atual [___], ganho ponderal [___].\nBEG, CONSCIENTE E ORIENTADA EM TEMPO E ESPAÇO, ACIANÓTICA E ANICTÉRICA, MUCOSAS NORMOCORADAS E ÚMIDAS, EUPNEICA EM AA.\nAR: MVF+, SEM RA, SEM SINAIS DE ESFORÇO RESPIRATÓRIO.\nACV: BRNF EM 2 TEMPOS, SEM SOPROS.\nABDOME GRAVÍDICO: GLOBOSO, COMPATÍVEL COM IDADE GESTACIONAL, ÚTERO [___] cm DE ALTURA UTERINA. Indolor à palpação, sem sinais de irritação peritoneal, sem defesa, RHA presentes, TIMPANISMO À PERCUSSÃO. Ausência de massas palpáveis e de visceromegalias. DB e GIORDANO NEGATIVOS. Cicatriz de cesárea [ausente / presente e sem alterações], sem sinais de infecção.\nMEMBROS: BOA PERFUSÃO PERIFÉRICA, SEM EDEMAS E SEM LESÕES APARENTES, TEC < 3 SEG.\nSNC: PUPILAS ISOCÓRICAS E FOTORREAGENTES, SEM DÉFICITS FOCAIS, SEM SINAIS MENÍNGEOS."
+      },
+      {
+        t: "Exame obstétrico",
+        x: "Altura uterina: [___] cm, compatível com a IG de [___] semanas.\nBCF: [___] bpm, rítmicos, em boa frequência.\nMovimentos fetais: presentes e percebidos pela paciente.\nDinâmica uterina: ausente, sem contrações dolorosas no momento, relaxamento uterino adequado.\nApresentação: [cefálica / pélvica / transversa], situação longitudinal, dorso [à direita / à esquerda].\nEspecular: sem sangramento ativo, sem perda de líquido, colo [fechado / grosso / central], sem lesões aparentes.\nToque vaginal: colo [___] cm de dilatação, [___]% de apagamento, altura [___], bolsa íntegra, apresentação [___]."
+      }
+    ]
+  },
+  {
+    id: "sangramento",
+    aba: "Sangramento",
+    titulo: "Sangramento vaginal",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de sangramento vaginal com início há [___], [em curso / já cessado], de volume [pequeno / moderado / intenso], estimado em [___] absorventes ou [___] mL, de coloração [vermelho vivo / escura / borra de café], [com / sem] coágulos [___]. Refere relação com [esforço / relação sexual / toque / trauma / sem fator desencadeante]. Associa [dor abdominal / dor lombar / sem dor] de [tipo e intensidade, EVA ___/10]. Nega [contrações / sensação de barriga endurecendo] e perda de líquido. Movimentos fetais [presentes / diminuídos / ausentes], última percepção há [___]. Refere [tontura / síncope / palpitação / sudorese / sem sintomas de hipovolemia]. Gestação de [___] semanas, pré-natal [regular / irregular], com placenta [normoinserida / prévia / baixa] identificada em USG, [sem / com] sangramentos anteriores, cesárea prévia [sim / não]. Tipagem [___], Rh [positivo / negativo], imunoglobulina anti-D [aplicada / não indicada / não aplicada]. Uso de substâncias [negado / referido: ___]."
+      },
+      {
+        t: "Exame",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, pele [fria e pálida / sem sinais de hipoperfusão]. Especular com sangramento de origem [cervical / vaginal / sem origem aparente], colo [___]. Toque vaginal realizado somente após exclusão de placenta prévia por USG. USG com placenta [___], descolamento [ausente / suspeito], vitalidade fetal [presente / ausente], líquido amniótico [___]. Laboratório solicitado: hemograma, tipagem e Rh, coagulograma, Coombs indireto se Rh negativo."
+      }
+    ]
+  },
+  {
+    id: "hipertensiva",
+    aba: "Síndrome hipertensiva",
+    titulo: "Síndrome hipertensiva",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de [cefaleia / alteração visual / dor epigástrica / edema / sem queixa específica] iniciada há [___], de intensidade EVA [___]/10, [localização ___], [diferente / semelhante] de cefaleias habituais, sem melhora com analgésico comum. Refere [escotomas / visão turva / fotofobia / fosfenos / sem alterações visuais], [dor epigástrica / dor em hipocôndrio direito / náusea / vômito / nenhum], edema súbito de [face / mãos / membros inferiores / ausente], ganho ponderal de [___] kg na última semana. Nega [dispneia / dor torácica / ortopneia / convulsão / confusão / sonolência]. Diurese [normal / diminuída / ausente nas últimas ___ horas]. Hipertensão prévia [sim / não], pré-eclâmpsia ou HELLP em gestação anterior [sim / não]. Uso de anti-hipertensivo [não / sim: medicação, dose, adesão, última tomada ___]. Uso de AAS para prevenção [sim / não]. Pré-natal com PA prévia de [___] mmHg, proteinúria [___], exames recentes [___]. Uso de substâncias [negado / referido: ___]."
+      },
+      {
+        t: "Exame",
+        x: "Ao exame, PA [___] x [___] mmHg, repetida após 15 minutos de repouso, nos dois braços [se houver dúvida]. FC [___] bpm, FR [___] irpm, SpO2 [___]%. Reflexos patelares [normais / exaltados / diminuídos], clônus [ausente / presente, ___ batimentos]. Edema [ausente / presente, localização e grau], sinal de Godet [negativo / positivo]. Ausculta pulmonar com [murmúrio vesicular presente, sem crepitações / crepitações em ___]. Palpação de epigástrio e hipocôndrio direito [indolor / dolorosa]. Estado neurológico: [consciente e orientada / rebaixamento ___], déficits focais [ausentes / presentes ___]. Fundo de olho ou exame visual dirigido [sem alterações / alterado ___]. Laboratório: hemograma com plaquetas, creatinina, ureia, TGO/TGP, LDH, relação proteína/creatinina, coagulograma se suspeita de HELLP. USG com vitalidade e crescimento fetal, Doppler de artérias umbilicais se disponível. CTG para bem-estar fetal."
+      },
+      {
+        t: "Classificação",
+        x: "Hipertensão gestacional: PA ≥ 140/90 mmHg após 20 semanas, sem proteinúria. Pré-eclâmpsia: hipertensão com proteinúria ou com disfunção de órgão-alvo (plaquetas < 100.000, creatinina > 1,1 mg/dL, transaminases ao dobro do normal, edema pulmonar, cefaleia persistente, escotomas, dor epigástrica). Hipertensão grave: PA ≥ 160 x 110 mmHg, que exige tratamento em até 30 a 60 minutos. Eclâmpsia: convulsão em paciente com pré-eclâmpsia. Síndrome HELLP: hemólise, enzimas hepáticas elevadas e plaquetas baixas."
+      },
+      {
+        t: "Conduta",
+        x: "Anti-hipertensivo conforme protocolo local (hidralazina, labetalol ou nifedipino), com medicação [___], dose [___], horário [___] e PA após cada dose [___]. Sulfato de magnésio [indicado / não indicado], com monitorização de diurese, reflexos e frequência respiratória, e gluconato de cálcio disponível. Corticoide antenatal [indicado / não indicado] para IG entre 24 e 34 semanas. Balanço hídrico e diurese horária [___]. Encaminhamento para [obstetrícia / UTI obstétrica], comunicado à equipe de referência às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "dor-abdominal",
+    aba: "Dor abdominal",
+    titulo: "Dor abdominal ou pélvica",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de dor [abdominal / pélvica] de localização [difusa / hipogástrio / flanco direito / flanco esquerdo / epigástrio / ___], com início há [___], de caráter [cólica / contínua / em pontada], intensidade EVA [___]/10, irradiando para [___ / sem irradiação]. Refere [relação / ausência de relação] com contrações, frequência [___]. Associa [náusea / vômito / febre / disúria / diarreia / sangramento / nenhum sintoma]. Nega [dor torácica / dispneia / dor em panturrilha / cefaleia] e alteração do trânsito intestinal ou urinário. Trauma abdominal [negado / referido: ___]."
+      },
+      {
+        t: "Exame",
+        x: "Ao exame, descompressão brusca [ausente / presente], rigidez uterina [ausente / presente], sinais de irritação peritoneal [ausentes / presentes], Giordano e Blumberg [negativos / positivos]. Punho-percussão lombar [negativa / positiva à direita / positiva à esquerda]. Ponto de McBurney e sinal de Rovsing [não avaliados / negativos / positivos], lembrando que o ponto se desloca com a gestação. USG com descolamento de placenta [ausente / suspeito], torção ovariana [excluída / suspeita], cisto anexial [ausente / presente ___]."
+      }
+    ]
+  },
+  {
+    id: "perda-liquido",
+    aba: "Perda de líquido",
+    titulo: "Perda de líquido (suspeita de rotura de membranas)",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de perda de líquido vaginal iniciada há [___], de volume [pequeno / moderado / intenso], com frequência [contínua / intermitente], relacionada [ou não] a esforço, tosse ou movimentação. Líquido de cor [clara / esverdeada / amarronzada / sanguinolenta], [sem odor / fétido]. Refere [febre / dor uterina / sem sintomas associados]. Gestação de [___] semanas, com tempo estimado desde a provável rotura de [___]. Nega atividade sexual ou uso de absorventes nas últimas [___] horas."
+      },
+      {
+        t: "Exame",
+        x: "Ao exame, especular com fluxo visível em fundo de saco posterior [presente / ausente], sem toque. pH vaginal [___], cristalização em lâmina (arborização) [positiva / negativa]. Temperatura [___] °C, FC materna [___] bpm. USG com índice de líquido amniótico [___], apresentação [___], vitalidade fetal [presente / ausente]. Toque vaginal somente se não houver contraindicação e após exclusão de placenta prévia. Ausculta fetal ou CTG com BCF [___] bpm, variabilidade [___], desacelerações [ausentes / presentes, tipo ___]."
+      }
+    ]
+  },
+  {
+    id: "contracoes",
+    aba: "Contrações",
+    titulo: "Contrações ou trabalho de parto",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de contrações uterinas iniciadas há [___], com frequência de [___] em 10 minutos, duração de [___] segundos, intensidade [leve / moderada / intensa], de padrão [regular / irregular], com [aumento / manutenção / redução] da intensidade. Refere [perda de rolha mucosa / perda de líquido / sangramento associado / nenhum]. Movimentos fetais [presentes / diminuídos]. Gestação de [___] semanas, [___] gestações anteriores, [___] partos anteriores, intervalo interpartal de [___]."
+      },
+      {
+        t: "Exame",
+        x: "Ao exame, dinâmica uterina com frequência [___] em 10 minutos, duração [___] s, intensidade à palpação [___], relaxamento uterino [adequado / incompleto]. Ausculta fetal ou CTG com BCF [___] bpm, variabilidade [___], desacelerações [ausentes / presentes, tipo ___]. Toque vaginal sem contraindicação: colo [___] cm de dilatação, [___]% de apagamento, altura [___], apresentação [___], bolsa [íntegra / rota], escore de Bishop [___]."
+      }
+    ]
+  },
+  {
+    id: "mov-fetais",
+    aba: "Mov. fetais",
+    titulo: "Redução ou ausência de movimentos fetais",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de redução [ou ausência] de movimentos fetais percebida há [___], com última percepção há [___]. Gestação de [___] semanas, pré-natal [regular / irregular]. Refere [contrações / sangramento / perda de líquido / dor abdominal / sem sintomas associados]. Movimentos fetais previamente percebidos de forma [regular / intensa]. Nega [febre / cefaleia / alteração visual / edema súbito], e refere [uso / não uso] de substâncias. Uso de [medicações / sem medicações em uso]. Movimentos fetais na última hora [___] e nas últimas 12 horas [___] (contagem de movimentos)."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC materna [___] bpm, FR [___] irpm, temperatura [___] °C. Altura uterina [___] cm, compatível com IG. BCF [___] bpm, ritmo [regular / irregular], variabilidade [___]. CTG com padrão [reativo / não reativo / suspeito / patológico], desacelerações [ausentes / presentes, tipo ___], reatividade [___] em [___] minutos. USG com vitalidade fetal [presente / ausente], atividade cardíaca [___], movimentos fetais [presentes / reduzidos], líquido amniótico [ILA ___ cm / MBV ___ cm], apresentação [___], placenta [normoinserida / com descolamento suspeito], Doppler de artéria umbilical [se disponível, ___]. Biometria fetal [compatível / discordante, ___]. Laboratório materno conforme indicação: hemograma, tipagem e Rh, glicemia, urina I.\n\nConduta registrada: CTG e USG com avaliação de bem-estar fetal, [internação para observação / alta com retorno em ___ horas], comunicado à equipe de referência às [___] horas. Orientações de contagem de movimentos fetais e sinais de alarme entregues por escrito."
+      }
+    ]
+  },
+  {
+    id: "abortamento",
+    aba: "Abortamento",
+    titulo: "Abortamento",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de sangramento vaginal [em pequena / moderada / grande quantidade] iniciado há [___], [com / sem] cólica associada de intensidade EVA [___]/10, localizada em [hipogástrio / difusa]. Última menstruação em [___] (DUM), gestação de [___] semanas por [DUM / USG]. Refere [eliminação de tecido / coágulos / sem eliminação de tecido]. Nega [febre / corrimento fétido / dor lombar / tontura / síncope]. Sangramento [em curso / cessado há ___]. Uso de misoprostol ou outros medicamentos [não / sim: ___]. Tentativa de abortamento induzido [negada / referida: ___]. Gestações anteriores [___] e partos [___]. Tipagem [___], Rh [positivo / negativo], imunoglobulina anti-D [aplicada / não indicada / não aplicada]. Hipótese de gestação de risco [sim / não]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, pele [fria e pálida / sem sinais de hipoperfusão], temperatura [___] °C. Abdome [flácido / doloroso à palpação em hipogástrio / sem irritação peritoneal]. Especular com sangramento de origem [cervical / intrauterina / sem origem aparente], colo [fechado / entreaberto / com tecido eliminado ___], [presença / ausência] de restos ovulares visíveis, sinais de infecção [ausentes / presentes: corrimento fétido, dor à mobilização do colo]. Toque vaginal [realizado / não realizado], colo [___]. USG transvaginal com saco gestacional [presente / ausente], embrião [com / sem] atividade cardíaca, CRL [___] mm, restos ovulares [ausentes / presentes ___ mm], endométrio [___] mm, líquido livre intrapélvico [ausente / presente]. Laboratório: hemograma, tipagem e Rh, beta-hCG quantitativo quando indicado, coagulograma se sangramento intenso.\n\nConduta registrada: classificação do abortamento [ameaça / em curso / incompleto / retido / séptico / completo]. Medidas conforme quadro: observação, analgesia, reposição volêmica se necessário, esvaziamento uterino (AMIU ou curetagem) quando indicado, antibioticoterapia em caso de suspeita de infecção. Imunoglobulina anti-D em gestante Rh negativo sem sensibilização, se indicada. Orientações de sinais de alarme, retorno e apoio psicológico entregues. Comunicado à equipe de referência às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "trauma",
+    aba: "Trauma",
+    titulo: "Trauma na gestação",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade após [queda / acidente de trânsito / agressão / outro: ___], ocorrido há [___], com mecanismo [___]. Refere [impacto direto no abdome / sem impacto abdominal]. Gestação de [___] semanas. Sintomas associados: [dor abdominal / dor pélvica / sangramento vaginal / perda de líquido / contrações / cefaleia / dispneia / dor torácica / nenhum]. Movimentos fetais [presentes / reduzidos / ausentes] desde o trauma. Uso de [medicações / substâncias / álcool] [não / sim: ___]. Tipagem [___], Rh [positivo / negativo]. Ocorrência de violência ou risco à segurança [negados / referidos, ver bloco específico]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, FR [___] irpm, SpO2 [___]%, Glasgow [___]. Avaliação de vias aéreas, respiração e circulação conforme ATLS, com identificação de lesões [ausentes / presentes: ___]. Abdome [flácido / doloroso / com descompressão brusca / com contratura]. Útero [em altura compatível com IG / com hipertonia / com contrações ___ em 10 minutos]. Sinais de descolamento de placenta [ausentes / suspeitos]. Especular [sem sangramento / com sangramento de origem ___], sem perda de líquido [ou com líquido ___]. Toque vaginal somente após exclusão de placenta prévia e sem sinais de rotura. Ausculta fetal ou CTG com BCF [___] bpm, reatividade [___], desacelerações [ausentes / presentes]. Exame de tórax, extremidades e coluna conforme mecanismo. USG (FAST materno e obstétrico) com líquido livre [ausente / presente], vitalidade fetal [___], descolamento de placenta [ausente / suspeito], lesões de órgãos [___].\n\nConduta registrada: observação mínima de 4 a 6 horas para trauma abdominal com gestação acima de 20 semanas, com CTG seriado e reavaliação materna. Gestação acima de 20 semanas com trauma abdominal relevante exige observação prolongada e monitorização fetal contínua. Rh negativo com trauma: imunoglobulina anti-D nas primeiras 72 horas, conforme protocolo. Encaminhamento para [obstetrícia / cirurgia / UTI / trauma] comunicado às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "violencia",
+    aba: "Violência",
+    titulo: "Violência doméstica ou sexual",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de [agressão física / violência sexual / ameaça / outro: ___], ocorrida há [___], em [domicílio / local ___], praticada por [___ (vínculo com a paciente) / desconhecido]. Refere [sim / não] uso de força, ameaça com arma ou intoxicação do agressor. Lesões referidas: [___]. Gestação de [___] semanas. Tempo entre o fato e o atendimento [___]. Sinais de alarme [ausentes / presentes: medo de retornar para casa, isolamento, histórico de agressões prévias]. Paciente [acompanhada / sozinha], [consente / não consente] com a avaliação. Desejo de notificação e encaminhamento [manifestado / não manifestado]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, estado emocional [ansiosa / calma / choro / sem alterações]. Lesões [ausentes / presentes: localização, tipo, data aproximada]. Exame genital [realizado com consentimento / não realizado], lesões genitais [ausentes / presentes: ___]. Coleta de material para exames forenses conforme protocolo local, com cadeia de custódia registrada. Ausculta fetal com BCF [___] bpm. USG com vitalidade fetal [___]. Profilaxia de IST e anticoncepção de emergência, se indicadas, conforme protocolo. Avaliação de risco de nova agressão e de feminicídio, com registro em prontuário.\n\nConduta registrada: acolhimento em sala privativa, com explicação dos procedimentos e consentimento antes de cada exame. Registro fiel da fala da paciente, sem questionamentos sobre a veracidade. Notificação compulsória e comunicação à rede de proteção conforme a legislação vigente e o protocolo local. Orientação sobre rede de apoio (Delegacia da Mulher, Centro de Referência, Ligue 180, 190 em emergência). Pré-natal e acompanhamento garantidos, com encaminhamento para serviço de referência. Abrigamento ou acompanhamento social quando houver risco iminente."
+      }
+    ]
+  },
+  {
+    id: "febre",
+    aba: "Febre",
+    titulo: "Febre e suspeita de infecção",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de febre iniciada há [___], com temperatura máxima aferida de [___] °C, em [contínua / intermitente]. Associa [calafrios / sudorese / mialgia / cefaleia / tosse / coriza / dor de garganta / disúria / dor lombar / corrimento vaginal / perda de líquido / sangramento / sem sintomas associados]. Gestação de [___] semanas, pré-natal [regular / irregular], vacinação [dTpa / influenza / COVID-19 atualizadas / não atualizadas]. Contato com pessoas com quadro semelhante [negado / referido]. Uso de antitérmico, última dose [___]. Comorbidades [___]. Movimentos fetais [presentes / diminuídos]. Uso de substâncias [negado / referido]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, FR [___] irpm, SpO2 [___]%, temperatura [___] °C, pulso fraco [sim / não], enchimento capilar [___]. Estado geral [bom / comprometido], consciência [preservada / alterada]. Foco infeccioso avaliado: ausculta pulmonar [___], orofaringe [___], punho-percussão lombar [negativa / positiva à direita / positiva à esquerda], abdome [indolor / doloroso em ___], dor à mobilização do colo [ausente / presente], corrimento vaginal [ausente / presente, aspecto ___], útero [não doloroso / doloroso à palpação]. Membros [sem sinais de trombose / com edema ou dor em panturrilha]. Ausculta fetal ou CTG com BCF [___] bpm, reatividade [___]. Laboratório: hemograma com desvio à esquerda, PCR, procalcitonina quando disponível, hemocultura se sepse, urocultura, lactato se instabilidade. USG com vitalidade fetal e líquido amniótico [___].\n\nConduta registrada: antitérmico conforme protocolo, com medicação [___], dose [___], horário [___]. Antibioticoterapia de amplo espectro, com escolha compatível com a gestação, após coleta de culturas, quando houver suspeita de sepse ou foco identificado. Corioamnionite: antibiótico e interrupção da gestação conforme IG e estado materno. Sepse: protocolo de sepse obstétrica, com antibiótico na primeira hora, reposição volêmica e comunicação imediata à UTI. Oseltamivir em caso de síndrome gripal com fatores de risco ou gravidade, conforme protocolo. Internação ou alta com retorno e sinais de alarme registrados. Comunicado à equipe de referência às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "disuria",
+    aba: "Disúria",
+    titulo: "Disúria e sintomas urinários",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de [disúria / polaciúria / urgência miccional / hematúria / urina turva / dor suprapúbica] iniciada há [___]. Associa [febre / calafrios / dor lombar / náusea / vômito / corrimento vaginal / sem sintomas associados]. Episódios prévios de infecção urinária [não / sim: número e tratamento ___]. Gestação de [___] semanas. Urocultura prévia [não realizada / resultado ___]. Uso de antibiótico nos últimos 30 dias [não / sim: ___]. Ingestão hídrica [adequada / reduzida]. Movimentos fetais [presentes / diminuídos]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, temperatura [___] °C. Punho-percussão lombar [negativa / positiva à direita / positiva à esquerda]. Abdome [indolor / doloroso em hipogástrio / com dor em flanco]. Ponto ureteral [indolor / doloroso]. Útero [não doloroso / doloroso à palpação]. Corrimento vaginal [ausente / presente, aspecto ___]. Ausculta fetal com BCF [___] bpm. Laboratório: urina I com leucocitúria [___] e nitrito [positivo / negativo], urocultura com coleta antes da antibioticoterapia, hemograma, creatinina, PCR.\n\nConduta registrada: antibiótico conforme resistência local e segurança na gestação, com nitrofurantoína ou cefalexina em esquema de [___] dias, conforme protocolo. Pielonefrite: internação, antibioticoterapia parenteral e hidratação, com reavaliação em [___] horas. Bacteriúria assintomática: tratamento conforme resultado de urocultura e protocolo. Orientações de hidratação e higiene. Retorno para controle de urocultura de cura em [___] dias. Comunicado à equipe de referência às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "toracica",
+    aba: "Dor torácica",
+    titulo: "Dor torácica ou dispneia",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de [dor torácica / dispneia / ambas] de início há [___], [súbito / gradual], de intensidade EVA [___]/10, em [caráter ___], irradiação [___ / sem irradiação], com piora [aos esforços / ao deitar / à respiração profunda] e melhora [em repouso / ao sentar / sem fatores de melhora]. Dispneia [aos esforços / em repouso / paroxística noturna / sem dispneia]. Refere [tosse / hemoptise / febre / palpitação / síncope / sudorese / sem sintomas associados]. Nega [dor em panturrilha / edema unilateral / ortopneia]. Gestação de [___] semanas. Fatores de risco para TEP [ausentes / presentes: imobilização, cirurgia recente, trombofilia, tromboembolismo prévio, uso de anticoncepcional, pré-eclâmpsia]. Antecedente de cardiopatia, asma ou doença pulmonar [não / sim: ___]. Uso de anticoagulante profilático [não / sim: ___]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, FR [___] irpm, SpO2 [___]% em ar ambiente, temperatura [___] °C. Estado geral [bom / comprometido], uso de musculatura acessória [ausente / presente]. Ausculta pulmonar com [murmúrio vesicular presente, sem crepitações / crepitações em ___ / sibilos / diminuição de murmúrio em ___]. Ausculta cardíaca com [BRNF em 2 tempos / B3 / B4 / sopro ___ / atrito pericárdico]. Pulsos periféricos [presentes / diminuídos]. PVJ [normal / elevada]. Edema de membros [ausente / presente, localização, simetria ___]. Panturrilhas [sem dor / dolorosas / sinal de Homans ___]. Ausculta fetal com BCF [___] bpm. Laboratório: troponina, D-dímero (com interpretação cautelosa em gestação, pois tende a estar elevado), BNP quando indicado, hemograma, gasometria, lactato, eletrólitos. ECG com [ritmo sinusal / alterações ___]. Radiografia de tórax com blindagem abdominal, quando indicada, justificada pelo benefício materno. Angiotomografia de artérias pulmonares ou cintilografia conforme disponibilidade, avaliando o risco fetal e o benefício materno. Ecocardiograma se suspeita de cardiomiopatia periparto ou disfunção ventricular.\n\nConduta registrada: analgesia e oxigenoterapia conforme SpO2. Se suspeita de TEP com estabilidade, anticoagulação com heparina de baixo peso molecular ou não fracionada conforme protocolo, pela possibilidade de não usar warfarina e DOAC na gestação. Se instabilidade hemodinâmica, protocolo de emergência com discussão com equipe de referência. Pneumonia: antibioticoterapia compatível com a gestação, conforme protocolo local. Internação em obstetrícia ou UTI conforme gravidade. Comunicado à equipe de referência às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "nauseas",
+    aba: "Náuseas",
+    titulo: "Náuseas e vômitos",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de náuseas e vômitos iniciados há [___], com frequência de [___] episódios por dia, [em jejum / após alimentação / sem relação com alimentação], conteúdo [alimentar / biliár / sanguinolento / sem conteúdo ___]. Refere [incapacidade de manter líquidos / capacidade de manter líquidos parcialmente / mantém líquidos]. Diurese [normal / diminuída / ausente nas últimas ___ horas]. Perda de peso de [___] kg desde o início dos sintomas, peso pré-gestacional [___] kg. Gestação de [___] semanas. Sintomas de desidratação: tontura ao levantar, boca seca, sede [ausentes / presentes]. Dor abdominal associada [não / sim: localização ___]. Cefaleia e alteração visual [negadas / referidas]. Febre [não / sim]. Uso de medicações [não / sim: ___], uso de substâncias [negado / referido]. Histórico de hiperêmese em gestação anterior [não / sim]. Tentativa de alimentação e hidratação domiciliar [___]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, temperatura [___] °C, peso atual [___] kg. Mucosas [úmidas / secas], turgor [preservado / diminuído], pele [hidratada / desidratada]. Abdome [indolor / doloroso em epigástrio / sem irritação peritoneal]. Sinais de síndrome de Mallory-Weiss ou esofagite, se houver hematêmese [ausentes / presentes]. Exame neurológico com [sem alterações / nistagmo / alteração de marcha, sugestivo de encefalopatia de Wernicke]. Ausculta fetal com BCF [___] bpm. USG com vitalidade fetal e líquido amniótico [___]. Laboratório: eletrólitos (sódio, potássio, cloro), ureia, creatinina, glicemia, gasometria, cetonúria em urina I, função hepática, lipase se dor abdominal, TSH se suspeita de hipertireoidismo, hemograma, tipagem e Rh.\n\nConduta registrada: reposição hidroeletrolítica por via venosa, com soro de manutenção e correção de eletrólitos conforme exames. Antiemético com segurança na gestação, conforme protocolo (metoclopramida, ondansetrona ou dimenidrinato, conforme indicação e disponibilidade). Tiamina antes de qualquer glicose em caso de desnutrição ou suspeita de Wernicke. Hiperêmese: critérios de internação com perda ponderal acima de 5%, cetonúria persistente, desidratação não corrigida ou alteração de eletrólitos. Orientação de dieta fracionada e retorno com sinais de alarme. Comunicado à equipe de referência às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "lombar",
+    aba: "Dor lombar",
+    titulo: "Dor lombar",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de dor lombar iniciada há [___], de intensidade EVA [___]/10, [localizada / irradiada para ___], [contínua / em cólica / em pontadas], com piora [ao movimento / ao esforço / em repouso / sem fator de piora] e melhora [em repouso / com analgésico / sem fator de melhora]. Relação com contrações uterinas [sim, frequência ___ / não]. Associa [disúria / febre / calafrios / náusea / vômito / sangramento vaginal / perda de líquido / corrimento / sem sintomas associados]. Histórico de cálculo renal ou infecção urinária [não / sim: ___]. Trauma recente [negado / referido: ___]. Gestação de [___] semanas. Movimentos fetais [presentes / diminuídos]. Sintomas de pré-eclâmpsia: cefaleia, escotomas, dor epigástrica [negados / presentes]. Uso de medicações [não / sim: ___]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, temperatura [___] °C. Punho-percussão lombar [negativa / positiva à direita / positiva à esquerda]. Coluna lombar [sem dor à palpação / dolorosa em ___]. Mobilidade lombar [preservada / reduzida]. Sinais de irritação radicular: Lasègue [negativo / positivo] se pertinente. Ponto ureteral [indolor / doloroso]. Abdome [indolor / doloroso em ___ / com dinâmica uterina]. Útero [relaxado / com contrações ___ em 10 minutos]. Sinais de descolamento de placenta ou sangramento [ausentes / presentes]. Ausculta fetal com BCF [___] bpm, reatividade [___]. Membros inferiores [sem edema / com edema, sinal de Godet ___]. Laboratório: urina I com leucocitúria e nitrito, urocultura, hemograma, creatinina, ureia, PCR se suspeita de infecção. USG com vitalidade fetal, descolamento de placenta [ausente / suspeito], dilatação pielocalicial [ausente / presente], cálculo renal se disponível.\n\nConduta registrada: analgesia conforme protocolo seguro na gestação (paracetamol como primeira linha, com dipirona e opioide em casos específicos). Dor lombar sem trabalho de parto nem infecção: orientação, analgesia e alta com retorno. Suspeita de pielonefrite: protocolo de pielonefrite, com antibiótico e internação conforme gravidade. Suspeita de cálculo: USG, analgesia e avaliação urológica, com ressalva de que a TC de baixa dose pode ser considerada com justificativa. Suspeita de trabalho de parto ou descolamento de placenta: encaminhar para o fluxo obstétrico específico. Comunicado à equipe de referência às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "diarreia",
+    aba: "Diarreia",
+    titulo: "Diarreia e sintomas gastrointestinais",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de diarreia iniciada há [___], com [___] evacuações por dia, aspecto [líquido / pastoso / com muco / com sangue / com gordura], [com / sem] tenesmo. Associa [náusea / vômito / dor abdominal em cólica / febre / calafrios / sintomas urinários / sem sintomas associados]. Dor abdominal [localização ___, intensidade EVA ___/10, melhora com evacuação: sim / não]. Refere [tolerância / intolerância] à ingesta de líquidos, diurese [normal / diminuída]. Contato com pessoas com diarreia ou alimentos suspeitos [negado / referido: ___]. Viagem recente [não / sim: ___]. Uso de antibiótico recente [não / sim: ___]. Gestação de [___] semanas. Movimentos fetais [presentes / diminuídos]. Sangramento vaginal ou perda de líquido [negados / referidos]. Uso de laxativo, antiácido com magnésio ou outros medicamentos [não / sim: ___]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, temperatura [___] °C, pele e mucosas [hidratadas / desidratadas], turgor [preservado / diminuído], sinal de prega cutânea [normal / lento]. Abdome [indolor / doloroso difusamente / doloroso em flanco direito, com sinal de McBurney ___, Rovsing ___, Murphy ___, sem irritação peritoneal]. Ruídos hidroaéreos [presentes / aumentados / diminuídos]. Útero [relaxado / com dinâmica uterina]. Ausculta fetal com BCF [___] bpm, reatividade [___]. Toque retal somente se indicado e com consentimento. Laboratório: hemograma, eletrólitos, ureia, creatinina, PCR, exame parasitológico de fezes e coprocultura quando indicados, lactato se toxemia, lipase e enzimas hepáticas se dor em hipocôndrio direito. USG abdominal com apêndice, vesícula biliar e vias biliares, se dor localizada ou suspeita de colecistite ou apendicite. USG obstétrico com vitalidade fetal e líquido amniótico [___].\n\nConduta registrada: reposição de líquidos por via oral (soro de reidratação oral) ou venosa conforme grau de desidratação. Antiemético e antitérmico conforme protocolo seguro na gestação. Evitar antidiarreico e antibiótico sem indicação clara. Antibioticoterapia somente se disenteria, sinais sistêmicos graves ou infecção comprovada, com escolha compatível com a gestação. Apendicite ou colecistite: avaliação cirúrgica e encaminhamento conforme protocolo, com monitorização fetal. Alta com orientações de hidratação, higiene das mãos e sinais de alarme, ou internação conforme gravidade. Comunicado à equipe de referência às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "hpp",
+    aba: "HPP",
+    titulo: "Hemorragia pós-parto (HPP) ou sangramento puerperal",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de sangramento vaginal iniciado há [___], em [pequena / moderada / grande] quantidade, estimado em [___] absorventes por hora ou [___] mL, com eliminação de [coágulos ___ / sem coágulos]. Parto [vaginal / cesárea] em [data], com [___] semanas de gestação, [normal / complicado: ___]. Puerpério de [___] dias. Sangramento [contínuo / intermitente], com [aumento / redução] nas últimas horas. Refere [tontura / síncope / palpitação / sudorese / dispneia / sem sintomas de hipovolemia]. Dor pélvica ou em hipogástrio [ausente / presente, intensidade EVA ___/10]. Uso de ocitocina ou misoprostol no parto [sim / não]. Retenção placentária ou manobras no parto [não / sim: ___]. Lacerações ou episiotomia [ausentes / presentes, com revisão ___]. Pós-parto imediato com sangramento aumentado [sim / não]. Uso de anticoagulante [não / sim: ___]. Tipagem [___], Rh [positivo / negativo]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, FR [___] irpm, SpO2 [___]%, temperatura [___] °C, pele [fria e pálida / sem sinais de hipoperfusão]. Abdome com útero [contraído, em altura ___ / hipotônico / doloroso à palpação], bexiga [vazia / distendida]. Toque bimanual avaliando tônus uterino e presença de coágulos intrauterinos [realizado / não realizado]. Especular com sangramento de origem [uterina / vaginal / cervical / sem origem aparente], lacerações [ausentes / presentes, grau ___], restos placentários visíveis [ausentes / presentes]. Exame de episiotomia ou cesárea [sem sinais de hematoma / com hematoma ___ / com sangramento na ferida]. Laboratório: hemograma, tipagem e Rh, coagulograma, fibrinogênio se sangramento intenso, lactato se instabilidade.\n\nConduta registrada: acesso venoso, reposição volêmica conforme perda estimada e hemodinâmica, com hemoderivados se indicado. Massagem uterina, ocitocina e, se necessário, misoprostol e ácido tranexâmico conforme protocolo de HPP. Esvaziamento uterino de restos placentários quando indicado. Balão intrauterino ou sutura de hemostasia em caso de atonia refratária, conforme disponibilidade. Sondagem vesical de demora e controle de diurese. Comunicação imediata à equipe obstétrica e à UTI conforme gravidade, com acionamento do protocolo de HPP. Imunoglobulina anti-D em Rh negativo não sensibilizado, se indicada."
+      }
+    ]
+  },
+  {
+    id: "pos-cesarea",
+    aba: "Dor pós-cesárea",
+    titulo: "Dor pélvica ou dor em ferida operatória (cesárea)",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de dor [pélvica / em ferida operatória / em períneo] iniciada há [___], de intensidade EVA [___]/10, de caráter [contínuo / em pontadas / em cólica], com [piora / melhora] ao [movimento / amamentação / deambulação / sem fator]. Parto [vaginal / cesárea] em [data], [com / sem] complicações. Puerpério de [___] dias. Dor [em cólica durante amamentação / em períneo com piora ao sentar / na cicatriz da cesárea]. Associa [febre / calafrios / secreção na ferida / odor fétido / sangramento / eliminação de coágulos / sem sintomas associados]. Eliminação de gases e fezes [presente / ausente]. Micção [normal / com dor / com retenção]. Sintomas urinários [ausentes / presentes]. Dor torácica, dispneia ou dor em panturrilha [negadas / referidas]. Uso de analgésico e dose [___]. Amamentação [em curso / suspensa], uso de medicações compatíveis com aleitamento [___]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, temperatura [___] °C. Útero [contraído, em altura ___ / subinvolução / doloroso à palpação]. Loquiação [normal / aumentada / fétida]. Ferida operatória (cesárea) [limpa, sem hiperemia, sem secreção / com hiperemia ___ / com secreção purulenta / com deiscência ___]. Períneo ou episiotomia [sem sinais de infecção / com hiperemia, edema, secreção, abscesso ___]. Dor à palpação de [mama / panturrilha / flanco]. Membros inferiores [sem edema, sem sinais de trombose / com edema, dor, Homans ___]. Toque bimanual [realizado / não realizado], dor à mobilização do útero [ausente / presente]. Laboratório: hemograma, PCR, urina I e urocultura se sintomas urinários, hemocultura se sepse, coleta de secreção da ferida quando indicada. USG pélvico se restos placentários, coleções ou hematomas suspeitos.\n\nConduta registrada: analgesia multimodal compatível com amamentação (paracetamol, dipirona, anti-inflamatório conforme função renal e protocolo, opioide em casos específicos). Infecção de ferida: antibioticoterapia conforme gravidade, drenagem de coleção se houver, curativo e orientação. Endometrite: antibiótico de amplo espectro, após coleta de culturas, com internação se sinais sistêmicos. Tromboembolismo suspeito: avaliação e anticoagulação conforme protocolo. Comunicado à equipe obstétrica às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "febre-puerperio",
+    aba: "Febre puerpério",
+    titulo: "Febre no puerpério",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de febre iniciada há [___], com temperatura máxima de [___] °C. Puerpério de [___] dias, parto [vaginal / cesárea]. Associa [calafrios / dor pélvica / dor em ferida / secreção de ferida / odor fétido na loquiação / dor mamária / sintomas urinários / tosse / dispneia / sem sintomas associados]. Loquiação [normal / fétida / com aumento de volume]. Amamentação [em curso / suspensa], presença de [hiperemia / nódulo / dor mamária]. Uso de antibiótico no parto ou no puerpério [não / sim: ___]. Dor de cabeça intensa ou alteração visual [negadas / referidas]. Sintomas de trombose [negados / referidos]. Eliminação de gases e fezes [presente / ausente]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, FR [___] irpm, SpO2 [___]%, temperatura [___] °C. Estado geral [bom / comprometido]. Útero [contraído / subinvolução / doloroso à palpação]. Loquiação [___], com odor [ausente / fétido]. Ferida operatória ou períneo [sem sinais de infecção / com sinais de infecção ___]. Mamas [sem alterações / hiperemia, calor, nódulo flutuante ___]. Ausculta pulmonar [___]. Punho-percussão lombar [negativa / positiva à direita / positiva à esquerda]. Membros inferiores [sem sinais de trombose / com edema, dor, Homans ___]. Laboratório: hemograma, PCR, urina I e urocultura, hemoculturas se sepse, cultura de loquiação quando indicada. USG pélvico se suspeita de restos placentários ou coleção.\n\nConduta registrada: protocolo de sepse obstétrica se critérios presentes, com antibiótico precoce e reposição volêmica. Endometrite: antibioticoterapia de amplo espectro (ex.: clindamicina e gentamicina, ou esquema conforme protocolo), com internação conforme gravidade. Mastite: antibiótico compatível com amamentação, esvaziamento mamário, orientação de manter aleitamento, avaliação de abscesso. Pielonefrite: protocolo específico. Restos placentários: esvaziamento conforme indicação. Comunicado à equipe obstétrica às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "pre-eclampsia-puerperio",
+    aba: "Pré-eclâmpsia puerpério",
+    titulo: "Pré-eclâmpsia e pressão alta no puerpério",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de [cefaleia / alteração visual / dor epigástrica / edema / dispneia / sem queixa específica] iniciada há [___], de intensidade EVA [___]/10. Puerpério de [___] dias, parto [vaginal / cesárea], [com / sem] diagnóstico de hipertensão ou pré-eclâmpsia na gestação. Uso de anti-hipertensivo [não / sim: medicação, dose, adesão, última tomada ___]. Refere [escotomas / fosfenos / sem alterações visuais], [dor epigástrica / dor em hipocôndrio direito / náusea / vômito / nenhum], edema de [face / mãos / membros inferiores / ausente]. Nega [dispneia / ortopneia / dor torácica / convulsão / confusão]. Diurese [normal / diminuída]. Sangramento vaginal [ausente / presente, volume ___]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] x [___] mmHg, repetida após 15 minutos de repouso. FC [___] bpm, FR [___] irpm, SpO2 [___]%. Reflexos patelares [normais / exaltados / diminuídos], clônus [ausente / presente ___ batimentos]. Edema [ausente / presente, localização e grau], sinal de Godet [negativo / positivo]. Ausculta pulmonar [sem crepitações / com crepitações em ___]. Palpação de epigástrio e hipocôndrio direito [indolor / dolorosa]. Estado neurológico [consciente e orientada / rebaixamento ___], déficits focais [ausentes / presentes ___]. Laboratório: hemograma com plaquetas, creatinina, ureia, TGO/TGP, LDH, relação proteína/creatinina, urina I. Lembrar que a pré-eclâmpsia pode surgir ou piorar nas primeiras 48 a 72 horas após o parto.\n\nConduta registrada: anti-hipertensivo conforme protocolo (nifedipino, labetalol ou hidralazina), com dose, horário e PA após cada dose. Sulfato de magnésio se pré-eclâmpsia grave ou eclampsia, com monitorização de diurese, reflexos e frequência respiratória, e gluconato de cálcio disponível. Balanço hídrico e diurese. Internação em obstetrícia ou UTI obstétrica conforme gravidade. Comunicado à equipe obstétrica às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "toracica-puerperio",
+    aba: "TEP puerpério",
+    titulo: "Dor torácica, dispneia ou dor em panturrilha no puerpério (suspeita de TEP ou cardiomiopatia periparto)",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de [dor torácica / dispneia / dor em panturrilha / palpitação / edema de membros inferiores] iniciada há [___], de início [súbito / gradual]. Puerpério de [___] dias, parto [vaginal / cesárea]. Dispneia [aos esforços / em repouso / ortopneia / paroxística noturna / sem dispneia]. Refere [tosse / hemoptise / síncope / sudorese / sem sintomas associados]. Fatores de risco para TEP [imobilização prolongada, cesárea de urgência, transfusão, infecção pós-parto, HPP, trombofilia, tromboembolismo prévio, uso de anticoncepcional, obesidade / ausentes]. Profilaxia de TEP com heparina no puerpério [não / sim: ___]. Antecedente de pré-eclâmpsia, miocardiopatia ou cardiopatia [não / sim: ___]. Dor ou edema unilateral em membro inferior [ausente / presente, lado ___]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, FR [___] irpm, SpO2 [___]% em ar ambiente. Estado geral [bom / comprometido], uso de musculatura acessória [ausente / presente]. Ausculta cardíaca com [BRNF em 2 tempos / B3 / B4 / sopro ___ / atrito pericárdico]. Ausculta pulmonar [murmúrio vesicular presente / crepitações em ___ / sibilos]. Pulsos periféricos [presentes / diminuídos]. PVJ [normal / elevada]. Membros inferiores [sem edema / edema unilateral ___ / sinal de Homans ___, panturrilha ___ cm de diferença]. Laboratório: troponina, D-dímero (pouco útil no pós-parto imediato, pois tende a estar elevado), BNP, hemograma, gasometria, lactato. ECG com [ritmo sinusal / taquicardia / alterações ___]. Ecocardiograma se suspeita de cardiomiopatia periparto. Angiotomografia de artérias pulmonares ou ultrassonografia venosa de membros inferiores conforme disponibilidade e estabilidade.\n\nConduta registrada: oxigenoterapia conforme SpO2. Se TEP provável ou confirmado com estabilidade, anticoagulação com heparina de baixo peso molecular ou não fracionada, conforme protocolo. Warfarina e DOAC compatíveis com amamentação devem ser discutidas com a equipe de referência (warfarina é segura na lactação; DOAC não é recomendada). Instabilidade hemodinâmica: protocolo de emergência com discussão imediata com a equipe e UTI. Cardiomiopatia periparto: avaliação cardiológica e internação. Comunicado à equipe obstétrica às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "depressao-puerperio",
+    aba: "Depressão puerpério",
+    titulo: "Depressão e sofrimento psíquico no puerpério",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de [tristeza persistente / choro frequente / ansiedade / insônia / ideias de desvalia / pensamentos de morte / sem queixa específica], iniciada há [___], após o parto de [data]. Puerpério de [___] dias. Refere [alterações do sono / do apetite / perda de interesse / cansaço excessivo / dificuldade de vínculo com o bebê / medo de fazer mal ao bebê / sem sintomas associados]. Rede de apoio [presente / ausente], parceiro [presente / ausente]. Histórico de depressão ou transtorno psiquiátrico [não / sim: ___]. Uso de medicações psiquiátricas [não / sim: ___]. Uso de substâncias [negado / referido: ___]. Ideação suicida [negada / presente: frequência, plano, meios ___]. Ideação de fazer mal ao bebê [negada / presente, ver conduta]. Violência doméstica [negada / referida, ver bloco específico]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, estado emocional [ansiosa / triste / calma / choro], humor [___], afeto [___], pensamento [sem alterações / com ideias ___], orientação e memória [preservadas / alteradas]. Sinais vitais [sem alterações / ___]. Investigação de causas orgânicas: hemograma, TSH, glicemia, ferritina, vitamina B12 quando indicado. Avaliação de sinais de psicose pós-parto (confusão, alucinação, agitação) [ausentes / presentes ___].\n\nConduta registrada: avaliação de risco de suicídio e de risco para o bebê, com segurança materna e do recém-nascido registrada. Encaminhamento para a rede de saúde mental e atenção básica, com acompanhamento. Psicose puerperal ou risco iminente: internação em serviço de psiquiatria, com apoio da equipe. Orientação a respeito de sinais de alarme e de rede de apoio (CAPS, CVV 188). Comunicado à equipe obstétrica e à atenção básica às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "mastite",
+    aba: "Mastite",
+    titulo: "Mastite e abscesso mamário",
+    blocos: [
+      {
+        t: "Anamnese",
+        x: "Paciente comparece à unidade com queixa de dor e aumento de volume em mama [direita / esquerda / bilateral], iniciada há [___], com [hiperemia / calor / endurecimento / nódulo palpável / secreção mamilar], de intensidade EVA [___]/10. Puerpério de [___] dias. Amamentação [em curso / suspensa há ___], com [fissuras / ingurgitamento / pega inadequada / esvaziamento irregular / uso de bomba]. Esvaziamento mamário [regular / irregular / ausente nas últimas ___ horas]. Associa [febre / calafrios / mal-estar / cefaleia / sintomas gripais / sem sintomas associados]. Sintomas urinários ou de ferida operatória [negados / referidos: ___]. Uso de antibiótico no puerpério [não / sim: medicação, dose, duração ___]. Uso de medicações compatíveis ou não com aleitamento [___]. Uso de sutã apertado, sono em decúbito ou outros fatores de compressão [não / sim: ___]. Episódios prévios de mastite [não / sim: ___]. Sintomas de sepse [ausentes / presentes: confusão, taquipneia, hipotensão, oligúria ___]."
+      },
+      {
+        t: "Exame e conduta",
+        x: "Ao exame, PA [___] mmHg, FC [___] bpm, FR [___] irpm, SpO2 [___]%, temperatura [___] °C. Estado geral [bom / comprometido]. Mamas com [simetria preservada / assimetria à direita / assimetria à esquerda]. Mama [direita / esquerda] com [hiperemia em quadrante ___, calor local, edema / sem alterações]. Palpação com [área de endurecimento em quadrante ___, dor à palpação / nódulo flutuante ___ cm, sugestivo de abscesso / sem nódulo]. Flutuação [ausente / presente]. Fissuras mamilares [ausentes / presentes, localização ___]. Secreção mamilar [ausente / presente, aspecto ___, sanguinolenta / purulenta]. Linfonodos axilares [não palpáveis / dolorosos / aumentados ___]. Ausculta pulmonar, abdome e exame de loquiação e útero [sem alterações / ___]. Punho-percussão lombar [negativa / positiva]. Membros inferiores [sem sinais de trombose / com edema ou dor em panturrilha]. Laboratório: hemograma, PCR, urina I e urocultura se sintomas urinários, hemocultura se sepse, cultura de secreção mamilar ou de coleção quando disponível. USG mamário se nódulo, flutuação ou suspeita de abscesso, para diferenciar de coleção e de processo inflamatório sem coleção.\n\nConduta registrada: manutenção do aleitamento na mama afetada, quando possível, com orientação de pega correta, esvaziamento frequente e compressas. Amamentação não é contraindicada na mastite; a interrupção só deve ser considerada em abscesso, com orientação de esvaziamento com bomba até a reavaliação. Analgesia e anti-inflamatório conforme função renal e protocolo, com paracetamol ou dipirona como primeira linha. Antibioticoterapia compatível com a amamentação, conforme protocolo local (ex.: cefalexina ou amoxicilina com clavulanato, por 10 a 14 dias), iniciada na suspeita de mastite com sinais sistêmicos ou falha do tratamento conservador. Abscesso com flutuação ou nódulo maior que 3 cm: drenagem por punção guiada por ultrassom ou incisão e drenagem, com cultura do material. Sepse ou sinais sistêmicos graves: internação, hemoculturas, antibiótico parenteral e reposição volêmica conforme protocolo de sepse obstétrica. Orientação de retorno em 48 a 72 horas, sinais de alarme e manutenção do aleitamento. Comunicado à equipe obstétrica ou à atenção básica às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "enfermaria",
+    aba: "Enfermaria",
+    titulo: "Enfermaria obstétrica: admissão e evolução",
+    blocos: [
+      {
+        t: "Admissão",
+        x: "Identificação e dados obstétricos: Paciente [___] anos, admitida em [data e hora] pela [PS / centro obstétrico / ambulatório], procedente de [___]. IG [___] semanas por [DUM / USG], DPP [___]. G[___] P[___] (T[___] P[___] A[___] V[___]). Pré-natal [regular / irregular], [___] consultas. Tipagem [___], Rh [positivo / negativo], imunoglobulina anti-D [aplicada / não indicada / não aplicada]. Sorologias [___]. Cesárea prévia [não / sim: ___]. Comorbidades [___]. Medicações em uso [___]. Alergias [___].\n\nMotivo da internação: Paciente internada por [___], com [hipótese diagnóstica ___]. Queixas no momento da admissão: [___].\n\nExame de admissão: Ao exame, estado geral [bom / regular / comprometido], consciência [preservada / alterada], PA [___] mmHg, FC [___] bpm, FR [___] irpm, SpO2 [___]%, TAX [___] °C. Peso [___] kg. Pele e mucosas [___]. Aparelho respiratório [___]. Aparelho cardiovascular [___]. Abdome grávido [globoso, compatível com IG / alterações ___], AU [___] cm, BCF [___] bpm, movimentos fetais [presentes / diminuídos / ausentes]. Dinâmica uterina [ausente / presente, ___ em 10 minutos]. Apresentação [___]. Especular [sem sangramento / sangramento de origem ___]. Toque vaginal [não realizado / realizado: colo ___ cm, apagamento ___%, altura ___, bolsa ___]. Membros [sem edemas / edema ___]. Panturrilhas [sem dor / alteração ___]. Exame específico à queixa [___].\n\nAvaliação de risco: Risco obstétrico [habitual / alto], motivo [___]. Escore de risco ou classificação institucional [___].\n\nPlano de admissão: Medicações [prescrição com dose, via e horário]. Exames solicitados [___]. Monitorização [BCF e dinâmica de [___] em [___] horas / sinais vitais de [___] em [___] horas / balanço hídrico]. Dieta [___]. Repouso [___]. Acesso venoso [sim / não, calibre ___]. Cuidados de enfermagem [___]. Sinais de alarme orientados à paciente e ao acompanhante. Equipe obstétrica responsável [___], comunicada às [___] horas."
+      },
+      {
+        t: "Evolução diária",
+        x: "Identificação: Dia de internação [___]. IG atual [___] semanas. Conduta anterior [___].\n\nS — Subjetivo: Paciente [refere melhora / refere piora / sem queixas] de [___]. Dor [ausente / presente, EVA ___/10, localização ___]. Movimentos fetais [presentes / diminuídos / ausentes]. Contrações [ausentes / presentes, ___ em 10 minutos]. Sangramento [ausente / presente: volume ___]. Perda de líquido [ausente / presente: aspecto ___]. Náuseas ou vômitos [ausentes / presentes]. Sintomas urinários [ausentes / presentes]. Alimentação [aceita / parcial / recusa]. Eliminações intestinais [presentes, última ___]. Sono e humor [___]. Queixas de cefaleia, escotomas ou dispneia [negadas / referidas: ___].\n\nO — Objetivo: Sinais vitais [PA ___ mmHg, FC ___ bpm, FR ___ irpm, SpO2 ___%, TAX ___ °C]. Diurese [___ mL em ___ horas]. Balanço hídrico [___ mL]. Peso [___] kg. Ao exame, estado geral [bom / regular / comprometido], consciência [preservada / alterada]. Aparelho respiratório [___]. Aparelho cardiovascular [___]. Abdome [globoso, compatível com IG, indolor / doloroso em ___]. AU [___] cm. BCF [___] bpm, reatividade [___] (CTG [reativo / não reativo / suspeito / patológico] se realizado). Dinâmica uterina [___]. Especular ou toque [não realizado / realizado: ___]. Edema [ausente / presente, grau ___]. Reflexos [normais / alterados ___]. Exame específico à queixa [___]. Exames do dia [___]. Resultados [___]. Medicações em curso [___], com administrações realizadas e pendentes [___].\n\nA — Avaliação: Paciente em [evolução favorável / estável / sem alterações / com piora de ___]. Hipóteses diagnósticas atuais [___].\n\nP — Plano: Manter [conduta atual / alterar: ___]. Medicações [ajustes, com dose, via e horário]. Exames [solicitados / a repetir]. Monitorização [BCF, dinâmica, sinais vitais, diurese, glicemia capilar, outros ___]. Dieta [___]. Repouso e deambulação [___]. Cuidados de enfermagem [___]. Orientações entregues [___]. Critérios para alta ou transferência [___]. Comunicado à equipe obstétrica às [___] horas."
+      },
+      {
+        t: "Admissão pós-parto / pós-cesárea",
+        x: "Identificação e dados do parto: Puérpera [___] anos, admitida em [data e hora] pela [centro obstétrico / PS / outro serviço], procedente de [___]. Parto [vaginal / cesárea] em [data], com [___] semanas, [normal / complicado: ___]. Puerpério de [___] dias. G[___] P[___] (T[___] P[___] A[___] V[___]). Tipo de anestesia [___]. Tipagem [___], Rh [positivo / negativo], imunoglobulina anti-D [aplicada / não indicada / não aplicada]. Sorologias [___]. Comorbidades [___]. Medicações em uso [___]. Alergias [___].\n\nMotivo da internação: Paciente internada por [___], com [hipótese diagnóstica ___]. Queixas no momento da admissão: [___].\n\nExame de admissão: Ao exame, estado geral [bom / regular / comprometido], consciência [preservada / alterada], PA [___] mmHg, FC [___] bpm, FR [___] irpm, SpO2 [___]%, TAX [___] °C. Pele e mucosas [___]. Aparelho respiratório [___]. Aparelho cardiovascular [___]. Abdome [flácido, indolor / doloroso em ___]. Útero [contraído, em altura ___ / subinvolução / doloroso à palpação]. Loquiação [normal / aumentada / fétida]. Bexiga [vazia / distendida]. Ferida operatória (cesárea) [limpa, sem hiperemia, sem secreção / alterações ___]. Períneo ou episiotomia [sem alterações / alterações ___]. Mamas [sem alterações / alterações ___]. Membros inferiores [sem edema, sem sinais de trombose / alterações ___]. Panturrilhas [sem dor / Homans ___]. Exame específico à queixa [___].\n\nAvaliação de risco: Risco [habitual / alto], motivo [___]. Escore de risco ou classificação institucional [___].\n\nPlano de admissão: Medicações [prescrição com dose, via e horário], analgesia multimodal compatível com amamentação. Exames solicitados [___]. Monitorização [sinais vitais, diurese, loquiação e útero a cada ___ horas]. Anticoagulação profilática [prescrita / não indicada / contraindicada, motivo ___]. Dieta [___]. Deambulação [___]. Amamentação [em curso / suspensa], com apoio de [___]. Cuidados de enfermagem da ferida e de higiene [___]. Sinais de alarme orientados à paciente e ao acompanhante. Equipe obstétrica responsável [___], comunicada às [___] horas."
+      },
+      {
+        t: "Evolução diária pós-parto / pós-cesárea",
+        x: "Identificação: Dia de pós-parto [___]. Dia de internação [___]. Conduta anterior [___].\n\nS — Subjetivo: Puérpera [refere melhora / refere piora / sem queixas] de [___]. Dor [ausente / presente, EVA ___/10, localização ___]. Amamentação [em curso / suspensa], com [dificuldades / sem dificuldades ___]. Loquiação [normal / aumentada / fétida]. Sangramento [ausente / presente: volume ___]. Micção [espontânea / com dor / com retenção]. Elimininação de gases e fezes [presente, última ___ / ausente]. Alimentação [aceita / parcial / recusa]. Deambulação [sem dificuldades / com dificuldades ___]. Sono e humor [___]. Queixas de febre, cefaleia, escotomas, dispneia ou dor em panturrilha [negadas / referidas: ___].\n\nO — Objetivo: Sinais vitais [PA ___ mmHg, FC ___ bpm, FR ___ irpm, SpO2 ___%, TAX ___ °C]. Diurese [___ mL em ___ horas]. Balanço hídrico [___ mL]. Ao exame, estado geral [bom / regular / comprometido], consciência [preservada / alterada]. Aparelho respiratório [___]. Aparelho cardiovascular [___]. Abdome [flácido, indolor / doloroso em ___]. Útero [contraído, em altura ___ / subinvolução / doloroso]. Loquiação [___], com odor [ausente / fétido]. Ferida operatória (cesárea) [limpa, sem hiperemia, sem secreção / alterações ___]. Períneo [sem alterações / alterações ___]. Mamas [sem alterações / hiperemia, nódulo, dor ___]. Membros inferiores [sem edema / edema, dor, Homans ___]. Exame específico à queixa [___]. Exames do dia [___]. Resultados [___]. Medicações em curso [___], com administrações realizadas e pendentes [___].\n\nA — Avaliação: Puérpera em [evolução favorável / estável / sem alterações / com piora de ___]. Hipóteses diagnósticas atuais [___].\n\nP — Plano: Manter [conduta atual / alterar: ___]. Medicações [ajustes, com dose, via e horário]. Exames [solicitados / a repetir]. Monitorização [sinais vitais, diurese, loquiação e útero, ferida, outros ___]. Dieta [___]. Deambulação e cuidados com a ferida [___]. Apoio à amamentação [___]. Orientações entregues sobre sinais de alarme, contracepção e cuidados com o recém-nascido [___]. Critérios para alta ou transferência [___]. Comunicado à equipe obstétrica às [___] horas."
+      }
+    ]
+  },
+  {
+    id: "primeira-consulta-ubs",
+    aba: "Primeira consulta UBS",
+    titulo: "Pré-natal: primeira consulta (UBS)",
+    blocos: [
+      {
+        t: "Primeira consulta",
+        x: "S\nGestante, X anos, X semanas de gestação por [DUM/USG], DUM: , DPP: . G X P X A X.\nComparece à unidade para início do pré-natal. Relata gestação [planejada/não planejada], [desejada/não desejada]. Com/ sem uso de ácido fólico antes da gestação.\nAntecedentes obstétricos: número de gestações, tipo de parto, idade gestacional ao nascimento, intercorrências anteriores (pré-eclâmpsia, diabetes gestacional, restrição de crescimento fetal, prematuridade, abortamentos, natimortalidade, hemorragias e isoimunização Rh).\nNo momento, relata [náuseas/vômitos/sialorreia/cansaço/sintomas urinários/sangramento/perda de líquido/dor pélvica/sem queixas]. Movimentação fetal: [ainda não percebida/percebida desde ___ semanas], quando aplicável.\nComorbidades: hipertensão arterial, diabetes mellitus, doenças tireoidianas, renais, cardíacas, autoimunes, hematológicas, trombofilias, epilepsia e transtornos psiquiátricos.\nMedicamentos em uso: \nAlergias: \nCirurgias prévias: \nAntecedentes ginecológicos: menarca, regularidade menstrual, ISTs, infecções ginecológicas, cirurgias ginecológicas, citopatológico do colo uterino \nHistórico familiar: pré-eclâmpsia, diabetes, hipertensão, trombose, malformações congênitas, doenças genéticas e gestação gemelar.\nHábitos de vida:\nTabagismo (ativo e passivo).\nEtilismo.\nUso de drogas ilícitas.\nAlimentação e atividade física.\nCondições de trabalho e exposição ocupacional.\nRede de apoio familiar e do parceiro.\nCondições de moradia e segurança alimentar.\nSaúde mental.\nRastreio de violência doméstica, em ambiente privativo.\n\nHistórico vacinal\nHepatite B: completar 3 doses conforme histórico vacinal.\ndT: completar esquema de 3 doses, se necessário.\nInfluenza: 1 dose por temporada, em qualquer trimestre.\nCOVID-19: 1 dose em cada gestação.\ndTpa: 1 dose a partir de 20 semanas, em toda gestação.\nVSR: 1 dose a partir de 28 semanas, em toda gestação.\n\nO\nExame físico\nBCF:    PA:  mmHg, FC bpm, FR  irpm, SpO2 %, TAX  °C. Peso  kg, IMC pré-gestacional , ganho ponderal esperado .\nBEG, CONSCIENTE E ORIENTADA EM TEMPO E ESPAÇO, ACIANÓTICA E ANICTÉRICA, MUCOSAS NORMOCORADAS E ÚMIDAS, EUPNEICA EM AA.\nAR: MVF+, SEM RA, SEM SINAIS DE ESFORÇO RESPIRATÓRIO.\nACV: BRNF EM 2 TEMPOS, SEM SOPROS.\nABDOME GRAVÍDICO: GLOBOSO, COMPATÍVEL COM IDADE GESTACIONAL, ÚTERO [___] cm DE ALTURA UTERINA. Indolor à palpação, sem sinais de irritação peritoneal, sem defesa, RHA presentes, TIMPANISMO À PERCUSSÃO. Ausência de massas palpáveis e de visceromegalias. DB e GIORDANO NEGATIVOS. Cicatriz de cesárea [ausente / presente e sem alterações], sem sinais de infecção.\nMEMBROS: BOA PERFUSAÇÃO PERIFÉRICA, SEM EDEMAS E SEM LESÕES APARENTES, TEC < 3 SEG.\nSNC: PUPILAS ISOCÓRICAS E FOTORREAGENTES, SEM DÉFICITS FOCAIS, SEM SINAIS MENÍNGEOS.\nMAMAS SEM ALTERAÇÕES\n\nA\nGestação de [___] semanas, [de baixo / alto] risco por [motivo ___].\n\nP\nExames de rotina do primeiro trimestre\nHemograma, tipagem ABO e Rh, Coombs indireto se Rh negativo. Glicemia de jejum. Sorologias: HIV, sífilis (VDRL ou RPR), hepatite B (HBsAg). Toxoplasmose IgG e IgM. Rubéola IgG. Urina I e urocultura. Hemoglobina eletroforese se risco (talassemias). Outros conforme história [___].\n\nRastreios e orientações\nRastreio de violência doméstica e sexual [realizado / sem sinais].\nRastreio de depressão e ansiedade [realizado / resultado ___].\nOrientação sobre tabagismo, álcool e drogas [realizada].\nOrientação sobre alimentação, atividade física e ganho de peso [realizada].\nSuplementação de ácido fólico [prescrita, dose ___].\nSuplementação de ferro conforme protocolo [___].\nVacinas: dTpa entre 27 e 36 semanas, influenza na época adequada, COVID-19 e hepatite B conforme situação vacinal.\nÁcido acetilsalicílico 100-150 mg para prevenção de pré-eclâmpsia se fatores de risco, a partir de 12 semanas.\nOrientação sobre sinais de alarme (sangramento, perda de líquido, dor, cefaleia, edema súbito, febre, diminuição de movimentos fetais), entregue por escrito.\n\nUltrassonografia\nUSG transvaginal entre 7 e 8s6d para datação e localização.\nUSG morfológico de primeiro trimestre entre 11 e 14 semanas com doppler de artérias.\nUSG morfológico de 2º trimestre entre 20 e 24 semanas com avaliação transvaginal.\nEcocardiograma fetal entre 22 a 28 semanas.\n\nSuplementações – gestação de risco habitual\nSuplemento | Dose | Período\nÁcido fólico | 400 mcg/dia | Até 12 semanas\nFerro elementar | 40 mg/dia | A partir de 20 semanas\nCálcio (MS) | 1.000 mg/dia | A partir de 12 semanas até o parto\n\nOrientações:\nSeparar ferro e cálcio por pelo menos 2 horas.\nInvestigar anemia e ajustar ferro se necessário.\nIndividualizar vitamina D, B12 e outros micronutrientes.\nAvaliar indicação de AAS para prevenção de pré-eclâmpsia."
+      }
+    ]
+  },
+  {
+    id: "proximas-consultas-ubs",
+    aba: "Próximas consultas UBS",
+    titulo: "Pré-natal: demais consultas (UBS)",
+    blocos: [
+      {
+        t: "Consulta de seguimento",
+        x: "S\nGestante, X anos, X semanas de gestação por [DUM/USG], DPP: . G X P X A X. Consulta nº [___].\nRefere [sem queixas / náuseas/vômitos/cansaço/sintomas urinários/dor lombar/dor pélvica]. Nega [sangramento / perda de líquido / contrações / cefaleia / escotomas / dor epigástrica / edema súbito / febre], [ou refere: ___].\nMovimentação fetal: [presente / diminuída / ausente], percebida pela gestante [sim / não].\nMedicamentos em uso e adesão: [___]. Suplementação em dia [sim / não, ajustes ___].\nExames recentes: [___].\nIntercorrências desde a última consulta: [nenhuma / ___].\nRastreio de violência doméstica em ambiente privativo [sem sinais / ver bloco específico].\n\nO\nBCF: [___] bpm, rrítmicos. PA: [___] mmHg, FC [___] bpm, FR [___] irpm, SpO2 [___]%, TAX [___] °C. Peso [___] kg (ganho de [___] kg desde a última consulta). Edema [ausente / presente, grau ___]. Altura uterina: [___] cm, compatível com IG. Apresentação: [cefálica / pélvica / transversa / não avaliada].\nBEG, CONSCIENTE E ORIENTADA EM TEMPO E ESPAÇO, ACIANÓTICA E ANICTÉRICA, MUCOSAS NORMOCORADAS E ÚMIDAS, EUPNEICA EM AA.\nAR: MVF+, SEM RA, SEM SINAIS DE ESFORÇO RESPIRATÓRIO.\nACV: BRNF EM 2 TEMPOS, SEM SOPROS.\nABDOME GRAVÍDICO: GLOBOSO, COMPATÍVEL COM IDADE GESTACIONAL, indolor à palpação, sem sinais de irritação peritoneal, RHA presentes. DB e GIORDANO NEGATIVOS.\nMEMBROS: BOA PERFUSAÇÃO PERIFÉRICA, [SEM EDEMAS / EDEMA ___], TEC < 3 SEG. Panturrilhas [sem dor / alteração ___].\nSNC: [SEM DÉFICITS FOCAIS, SEM SINAIS MENÍNGEOS / alteração ___].\nMAMAS [SEM ALTERAÇÕES / ___].\nExame específico [___].\n\nA\nGestação de [___] semanas, [evolução favorável / intercorrência: ___]. Risco [habitual / alto], motivo [___].\n\nP\nExames e rastreios conforme idade gestacional\nEntre 20 e 24 semanas: ultrassonografia morfológica do 2º trimestre [data e resultado ___].\nEntre 24 e 28 semanas: teste oral de tolerância à glicose com 75 g (TOTG) para rastreio de diabetes gestacional [realizado / antecipado por fator de risco, resultado ___].\nEntre 28 e 32 semanas: hemograma [___]. Repetir sorologias de HIV e sífilis conforme risco [___].\nRepetir urina I e urocultura se história de infecção urinária ou se indicado [___].\nApós 35 semanas: estreptococo do grupo B (cultura vaginal e retal entre 35 e 37 semanas) [coletado / não indicado / resultado ___].\nUltrassonografia de crescimento fetal e doppler se suspeita de restrição [___].\nVacinas: dTpa entre 27 e 36 semanas [aplicada / não aplicada, data ___]. VSR a partir de 28 semanas [aplicada / não aplicada]. Influenza na temporada [___]. COVID-19 conforme situação vacinal [___].\n\nSuplementações – gestação de risco habitual\nFerro elementar 40 mg/dia (a partir de 20 semanas) [em uso / ajustado para ___ mg/dia].\nCálcio 1.000 mg/dia (a partir de 12 semanas até o parto) [em uso].\nSeparar ferro e cálcio por pelo menos 2 horas.\n\nOrientações entregues: sinais de alarme (sangramento, perda de líquido, dor, cefaleia, edema súbito, febre, diminuição de movimentos fetais), movimentos fetais, alimentação, atividade física, amamentação e plano de parto [realizadas / a abordar].\nPróxima consulta em [___] semanas, com periodicidade [mensal até 28 semanas / quinzenal de 28 a 36 semanas / semanal a partir de 36 semanas]."
+      }
+    ]
+  },
+  {
+    id: "sinais-alarme",
+    aba: "Sinais de alarme",
+    titulo: "Sinais de alarme (orientação à gestante)",
+    blocos: [
+      {
+        t: "Sinais de alarme",
+        x: "Busque atendimento imediatamente se houver:\n• Pressão mais alta que o habitual ou mais alta que 140 x 90 mmHg.\n• Sangramento vaginal.\n• Dor abdominal forte ou persistente.\n• Febre (temperatura maior ou igual a 37,8 °C).\n• Dor de cabeça intensa ou que não melhora.\n• Alterações na visão, como visão turva, sensibilidade à luz, flashes, pontos cegos ou perda de visão.\n• Dor forte na região do estômago, logo abaixo da linha entre as mamas.\n• Dor ou ardência ao urinar.\n• Inchaço repentino no rosto, nas mãos ou nas pernas.\n• Diminuição ou ausência dos movimentos do bebê, especialmente se ficar mais de 4 horas sem se mexer após as 20 semanas de gestação.\n• Manchas vermelhas na pele ou vermelhidão nos olhos.\n• Mal-estar intenso ou sensação de que algo não está bem.\n• Dor forte no peito.\n• Falta de ar.\n• Convulsões.\n• Desmaio."
+      }
+    ]
+  },
+  {
+    id: "exames-periodo-ubs",
+    aba: "Exames por período UBS",
+    titulo: "Exames por período (UBS)",
+    blocos: [
+      {
+        t: "Primeiro trimestre (primeira consulta)",
+        x: "Hemograma, tipagem ABO e Rh, Coombs indireto se Rh negativo. Glicemia de jejum. Sorologias: HIV, sífilis (VDRL ou RPR), hepatite B (HBsAg). Toxoplasmose IgG e IgM. Rubéola IgG. Urina I e urocultura. Colpocitologia oncológica se não realizada recentemente. Hemoglobina eletroforese se risco (talassemias). Anti-HCV apenas em populações de risco (uso de drogas, parceiros de usuários, transfusão prévia, múltiplos parceiros). Outros conforme história [___]."
+      },
+      {
+        t: "Segundo trimestre (20 a 28 semanas)",
+        x: "Entre 20 e 24 semanas: ultrassonografia morfológica do 2º trimestre [data e resultado ___].\nEntre 24 e 28 semanas: teste oral de tolerância à glicose com 75 g (TOTG) para rastreio de diabetes gestacional [realizado / antecipado por fator de risco, resultado ___].\nUrocultura de controle, se indicado pelo protocolo do serviço [___].\nEcocardiograma fetal entre 22 e 28 semanas, se indicado [___]."
+      },
+      {
+        t: "Terceiro trimestre (28 semanas ao parto)",
+        x: "Em 28 semanas: hemograma para reavaliação de anemia [___]. Repetir VDRL no 3º trimestre, conforme protocolo [___]. Repetir sorologia de HIV conforme risco [___].\nUrocultura e urina I [___].\nEntre 35 e 37 semanas: cultura para estreptococo do grupo B (vaginal e retal) [coletado / não indicado / resultado ___].\nUltrassonografia de crescimento fetal e doppler se suspeita de restrição [___]."
+      },
+      {
+        t: "Observação",
+        x: "Confirmar estes intervalos e exames no documento atual da Febrasgo e no protocolo do serviço antes de usar. Os exames de rotina acima seguem a prática usual do pré-natal de baixo risco; gestantes de alto risco ou com alguma condição específica exigem exames adicionais."
+      }
+    ]
+  }
+];
+
+const SECOES = SECOES_TODAS.filter(s => s.id !== "geral" && s.id !== "exames-periodo-ubs");
+let listaAberta = false;
+
+const abas = document.getElementById("abas");
+const conteudo = document.getElementById("conteudo");
+const busca = document.getElementById("busca");
+let ativa = SECOES[0].id;
+
+function criarBloco(secao, bloco) {
+  const el = document.createElement("section");
+  el.className = "bloco";
+  el.dataset.busca = (secao.titulo + " " + bloco.t + " " + bloco.x).toLowerCase();
+  const topo = document.createElement("div");
+  topo.className = "bloco-topo";
+  const h = document.createElement("h2");
+  h.textContent = bloco.t;
+  const btn = document.createElement("button");
+  btn.className = "copiar";
+  btn.type = "button";
+  btn.textContent = "Copiar";
+  const p = document.createElement("p");
+  p.className = "texto";
+  p.textContent = bloco.x;
+  p.contentEditable = "true";
+  btn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(p.innerText);
+      btn.textContent = "Copiado";
+    } catch (e) {
+      const r = document.createRange();
+      r.selectNodeContents(p);
+      const s = window.getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+      btn.textContent = "Selecionado (Ctrl+C)";
+    }
+    setTimeout(() => (btn.textContent = "Copiar"), 1500);
+  });
+  topo.append(h, btn);
+  el.append(topo, p);
+  return el;
+}
+
+function renderAbas() {
+  abas.innerHTML = "";
+  SECOES.forEach(s => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(s.id === ativa));
+    b.textContent = s.aba;
+    b.addEventListener("click", () => { ativa = s.id; listaAberta = false; busca.value = ""; renderAbas(); renderConteudo(); });
+    abas.appendChild(b);
+  });
+}
+
+function renderLista(termo) {
+  conteudo.innerHTML = "";
+  const lista = SECOES.filter(s => !termo || (s.titulo + " " + s.blocos.map(b => b.x).join(" ")).toLowerCase().includes(termo));
+  const h = document.createElement("h2");
+  h.textContent = "Temas disponíveis";
+  h.style.fontSize = "17px";
+  conteudo.appendChild(h);
+  if (!lista.length) { const p = document.createElement("p"); p.className = "vazio"; p.textContent = "Nada encontrado."; conteudo.appendChild(p); return; }
+  lista.forEach(s => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "bloco";
+    btn.style.display = "block";
+    btn.style.width = "100%";
+    btn.style.textAlign = "left";
+    btn.style.cursor = "pointer";
+    btn.style.color = "var(--text)";
+    btn.style.font = "inherit";
+    btn.textContent = s.titulo;
+    btn.addEventListener("click", () => { ativa = s.id; listaAberta = false; busca.value = ""; renderAbas(); renderConteudo(); });
+    conteudo.appendChild(btn);
+  });
+}
+
+function renderConteudo() {
+  if (listaAberta) return renderLista(busca.value.trim().toLowerCase());
+  conteudo.innerHTML = "";
+  const s = SECOES.find(x => x.id === ativa);
+  const h = document.createElement("h2");
+  h.textContent = s.titulo;
+  h.style.fontSize = "17px";
+  conteudo.appendChild(h);
+  const tudo = s.blocos.map(b => b.t + "\n" + b.x).join("\n\n");
+  conteudo.appendChild(criarBloco(s, { t: "Texto para copiar", x: tudo }));
+}
+
+busca.addEventListener("focus", () => { listaAberta = true; renderConteudo(); });
+busca.addEventListener("input", () => { listaAberta = true; renderConteudo(); });
+renderAbas();
+renderConteudo();
+</script>
+</body>
+</html>
